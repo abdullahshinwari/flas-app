@@ -1,6 +1,6 @@
 import requests
 
-from flask import Flask
+from flask import Flask, request
 
 app = Flask(__name__)
 
@@ -10,7 +10,7 @@ NEWS_URL = ('https://newsapi.org/v2/top-headlines?'
             )
 
 SEARCH_NEWS_URL = ('https://newsapi.org/v2/everything?'
-                   'q=Taliban&'
+                   'q={}&'
                    'from=2021-08-21&'
                    'sortBy=popularity&'
                    'apiKey=e092ed30578546bda11eeb912e62942b'
@@ -37,8 +37,10 @@ def search_news():
     This API will get all news containing a specific keyword and will return it in response.
     :return: json
     """
+    keyword = request.args.get('search')
+    url = SEARCH_NEWS_URL.format(keyword)
     try:
-        response = requests.get(url=SEARCH_NEWS_URL)
+        response = requests.get(url=url)
     except ConnectionError as e:
         return {"message": e}
     json_body = response.json()

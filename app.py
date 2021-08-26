@@ -1,6 +1,8 @@
 import requests
 
-from flask import Flask, Response, request
+from flask import Flask, request
+
+from utils import to_json
 
 
 app = Flask(__name__)
@@ -17,12 +19,14 @@ def news():
     This API will get all news and will return it in response.
     :return: json
     """
-    json_response = dict()
     try:
         response = requests.get(url=URL)
+        if response.status_code != 200:
+            return to_json(data="", message='Error', status_code=400)  # dummy status code
     except ConnectionError as e:
-        return {"message": e}
-    return Response(response, status=200, mimetype='application/json')
+        return to_json(data="", message=e, status_code=400)  # dummy status code
+    response_data = response.json()
+    return to_json(data=response_data, message="Success", status_code=200)
 
 
 @app.route("/search-news", methods=['GET'])
@@ -35,9 +39,12 @@ def search_news():
     url = URL.format('q=' + keyword + '&')
     try:
         response = requests.get(url=url)
+        if response.status_code != 200:
+            return to_json(data="", message='Error', status_code=400)  # dummy status code
     except ConnectionError as e:
-        return {"message": e}
-    return Response(response, status=200, mimetype='application/json')
+        return to_json(data="", message=e, status_code=400)  # dummy status code
+    response_data = response.json()
+    return to_json(data=response_data, message="Success", status_code=200)
 
 
 if __name__ == "__main__":
